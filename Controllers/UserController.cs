@@ -30,7 +30,7 @@ namespace AppZeroAPI.Controllers
         [HttpGet] 
         public async Task<IActionResult> GetAll()
         {
-            logger.LogInformation("called ProductController");
+            logger.LogInformation("called Product Controller");
             var data = await unitOfWork.Users.GetAllAsync();
             return AppResponse.Success(data);
         }
