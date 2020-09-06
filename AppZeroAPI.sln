@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30406.217
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppZeroAPI", "AppZeroAPI.csproj", "{0932FDEE-B117-4BA0-B172-7EB77F30ADE6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0932FDEE-B117-4BA0-B172-7EB77F30ADE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0932FDEE-B117-4BA0-B172-7EB77F30ADE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0932FDEE-B117-4BA0-B172-7EB77F30ADE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0932FDEE-B117-4BA0-B172-7EB77F30ADE6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A27A09E-8C2D-4D2E-8886-3FC454BA30CE}
+	EndGlobalSection
+EndGlobal
