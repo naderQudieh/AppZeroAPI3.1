@@ -25,34 +25,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace AppZeroAPI.Shared
 { 
-    public class ModelValidator
-    {
-        
-        public static void Validate(object model)
-        {
-            var validationContext = new ValidationContext(model);
-            var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
-            var validationResultIsValid = Validator.TryValidateObject(model, validationContext, validationResults, true);
-            if (!validationResultIsValid)
-            {
-                Models.ValidationResult validationResult = new Models.ValidationResult("One or more validation error should be fixed.");
-                foreach (var item in validationResults)
-                {
-                    FieldError fieldError = new FieldError
-                    {
-                        Field = item.MemberNames.First(),
-                        ErrorMessage = item.ErrorMessage
-                    };
-                    validationResult.Errors.Add(fieldError);
-                }
-
-                throw new Models.ValidationException(validationResult);
-            }
-        }
-    }
+   
     class JsonUnformatterBinderProvider : IModelBinderProvider
     {
         public IModelBinder GetBinder(ModelBinderProviderContext context)

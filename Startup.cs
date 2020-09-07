@@ -19,7 +19,7 @@ using System.Linq;
 using AppZeroAPI.Models;
 using WebApi.Shared;
 using AppZeroAPI.Shared;
- 
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AppZeroAPI
 {
@@ -36,6 +36,7 @@ namespace AppZeroAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddSingleton<IObjectModelValidator, NullObjectModelValidator>();
             // in memory database used for simplicity, change to a real db for production applications
             //services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb")); 
             services.AddDbContext<DataContext>(opt =>
@@ -43,9 +44,20 @@ namespace AppZeroAPI
                // opt => opt.UseInMemoryDatabase("TestDb")
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+             
             services.ConfigureAutoMapper();
-            services.AddCors();
-            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true); 
+            services.ConfigureCors();
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressConsumesConstraintForFormFileParameters = true;
+                options.SuppressInferBindingSourcesForParameters = true;
+                options.SuppressModelStateInvalidFilter = true;
+                })
+                .AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true)
+                .AddMvcOptions(options =>
+                {
+                    options.InputFormatters.Insert(0,new JsonStringInputFormatter());
+                });
             var appSettingsSection = Configuration.GetSection("JwtOptions");
             services.Configure<JwtOptions>(appSettingsSection);  
           

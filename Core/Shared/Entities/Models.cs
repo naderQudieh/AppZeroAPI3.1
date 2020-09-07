@@ -22,8 +22,27 @@ using System.IdentityModel.Tokens.Jwt;
 namespace AppZeroAPI.Models
 {
 
- 
- 
+    public class ResetPasswordRequest
+    {
+        [Required]
+        public string token { get; set; }
+
+        [Required]
+        [MinLength(6)]
+        public string password { get; set; }
+
+        [Required]
+        [Compare("Password")]
+        public string confirm_password { get; set; }
+    }
+    public class ForgotPasswordRequest
+    {
+        [Required]
+        [EmailAddress]
+        public string email { get; set; }
+    }
+
+
     public class RegisterDto
     {
         [Required]
@@ -39,8 +58,8 @@ namespace AppZeroAPI.Models
         [JsonProperty(Required = Required.DisallowNull)]
         public string Password { get; set; }
 
-        [Required]
-        [StringLength(12, MinimumLength = 4, ErrorMessage = "Password must be between 4 and 12 characters in length.")]
+        //[Required]
+        //[StringLength(12, MinimumLength = 4, ErrorMessage = "Password must be between 4 and 12 characters in length.")]
         [JsonProperty(Required = Required.DisallowNull)]
         public string ConfirmPassword { get; set; }
     }
@@ -49,12 +68,12 @@ namespace AppZeroAPI.Models
         [EmailAddress]
         [Required]
         [JsonProperty(Required = Required.DisallowNull)]
-        public string Email { get; set; }
+        public string username { get; set; }
 
         [Required]
         [StringLength(12, MinimumLength = 4, ErrorMessage = "Password must be between 6 and 12 characters in length.")]
         [JsonProperty(Required = Required.DisallowNull)]
-        public string Password { get; set; }
+        public string password { get; set; }
 
     }
     public class LogoutDto
@@ -83,40 +102,8 @@ namespace AppZeroAPI.Models
         public string ConfirmPassword { get; set; }
 
     }
-    public class FieldError
-    {
-        public string Field { get; set; }
-        public string ErrorMessage { get; set; }
-        public List<FieldError> SubErrors { get; set; } = new List<FieldError>();
-    }
-    public class ValidationResult
-    {
-        public string Message { get; set; }
-        public List<FieldError> Errors { get; set; } = new List<FieldError>();
-        public ValidationResult(string errorMessage)
-        {
-            Message = errorMessage;
-        }
-    }
-    public class ValidationException : Exception
-    {
-        public ValidationResult ValidationResult { get; set; }
 
-        public ValidationException(ValidationResult validationResult)
-        {
-            ValidationResult = validationResult;
-        }
-    }
-    public class AuthInfo
-    {
-        [Required]
-        public string AccessToken { get; set; }
-
-        [Required]
-        public string RefreshToken { get; set; }
-    }
-   
-    public class RefreshRequestDto
+    public class RequestAuthDto
     {
         [Required]
         public string AccessToken { get; set; }
@@ -125,7 +112,16 @@ namespace AppZeroAPI.Models
         public string RefreshToken { get; set; }
     }
 
-    public class UserTokenResponse
+    public class ResponseAuthDto
+    {
+        [Required]
+        public TokenInfoDto  Token { get; set; }
+
+        [Required]
+        public UserInfo User { get; set; }
+    }
+
+    public class TokenInfoDto
     { 
         [Required]
         [JsonProperty("access_token", Required = Required.DisallowNull)]
@@ -136,7 +132,11 @@ namespace AppZeroAPI.Models
         public string RefreshToken { get; set; }
           
         [JsonProperty("expires_at")]
-        public DateTime ExpiresAt { get; set; } 
+        public DateTime ExpiresAt { get; set; }
+
+        [Required]
+        [JsonProperty("token_type", Required = Required.DisallowNull)]
+        public string TokenType { get; set; }
     }
      
     public class UserInfo
@@ -170,49 +170,7 @@ namespace AppZeroAPI.Models
         public string ConfirmPassword { get; set; }
         public string Token { get; set; }
     }
-    public class UpdateRequest
-    {
-        private string _password;
-        private string _confirmPassword;
-        private string _role;
-        private string _email;
-
-        public string Title { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        public string Role { get; set; }
-
-
-        [EmailAddress]
-        public string Email
-        {
-            get => _email;
-            set => _email = replaceEmptyWithNull(value);
-        }
-
-        [MinLength(6)]
-        public string Password
-        {
-            get => _password;
-            set => _password = replaceEmptyWithNull(value);
-        }
-
-        [Compare("Password")]
-        public string ConfirmPassword
-        {
-            get => _confirmPassword;
-            set => _confirmPassword = replaceEmptyWithNull(value);
-        }
-
-        // helpers
-
-        private string replaceEmptyWithNull(string value)
-        {
-            // replace empty string with null to make field optional
-            return string.IsNullOrEmpty(value) ? null : value;
-        }
-    }
+   
 
     class SmtpSettings
     {

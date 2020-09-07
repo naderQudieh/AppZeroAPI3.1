@@ -10,28 +10,7 @@ using System.Text;
 namespace AppZeroAPI.Entities
 {
     
-    
-    public class ResetPasswordRequest
-    {
-        [Required]
-        public string token { get; set; }
 
-        [Required]
-        [MinLength(6)]
-        public string password { get; set; }
-
-        [Required]
-        [Compare("Password")]
-        public string confirm_password { get; set; }
-    }
-    public class ForgotPasswordRequest
-    {
-        [Required]
-        [EmailAddress]
-        public string email { get; set; }
-    }
-   
-  
 
 
     [Table("user_refresh_tokens")]
@@ -103,7 +82,9 @@ namespace AppZeroAPI.Entities
     [Table("user_profiles")]
     public class UserProfile
     { 
+        [Dapper.Contrib.Extensions.Key]
         [Key]
+        [Required]
         [Column("user_id")]
         [JsonProperty("user_id")]
         public int user_id { get; set; }
@@ -182,10 +163,13 @@ namespace AppZeroAPI.Entities
         public bool IsActive { get; set; }
     }
 
-    
 
+    [Table("products")]
     public class Product
     {
+        [Dapper.Contrib.Extensions.Key]
+        [Column("Id")]
+        [JsonProperty("Id")]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -197,7 +181,7 @@ namespace AppZeroAPI.Entities
     }
     public class Detect
     {
-        [Key]
+        [Dapper.Contrib.Extensions.Key]
         public int Id { get; set; }
 
         public string DeviceType { get; set; }

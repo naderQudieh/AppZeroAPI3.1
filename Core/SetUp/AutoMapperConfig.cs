@@ -9,6 +9,7 @@ using AppZeroAPI.Models;
 using AutoMapperConfiguration = AutoMapper.Configuration;
 using AutoMapper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+ 
 
 namespace AppZeroAPI.Setup
 {
@@ -59,8 +60,10 @@ namespace AppZeroAPI.Setup
             // ).AfterMap((src, dest) =>
             // {
             //     dest.lname  = "lname"; 
-                 
+
             // });
         }
     }
+    
+   
 }

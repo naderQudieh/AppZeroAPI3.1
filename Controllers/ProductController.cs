@@ -15,7 +15,7 @@ using AppZeroAPI.Shared;
 
 namespace AppZeroAPI.Controllers
 {
-    [AuthorizeUser]
+    //[AuthorizeUser]
     [ApiController]
     [Route("api/Products")]
     public class ProductController : BaseController

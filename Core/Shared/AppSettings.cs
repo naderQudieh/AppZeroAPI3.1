@@ -1,16 +1,18 @@
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace AppZeroAPI.Shared
 {
+
     public static class Langauge
     {
         public const int Arabic = 1;
         public const int English = 2;
-        public const int Spanish = 3; 
+        public const int Spanish = 3;
         public const int French = 4;
     }
     public static class Role

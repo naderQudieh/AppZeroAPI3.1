@@ -2,6 +2,7 @@
 using AppZeroAPI.Entities;
 using AppZeroAPI.Models;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -99,14 +100,14 @@ namespace AppZeroAPI.Repository
             }
         }
 
-        public async Task<UserProfile> GetByIdAsync(int id)
+        public async Task<UserProfile> GetByIdAsync(int user_id)
         {
 
-            var sql = "SELECT * FROM user_profiles WHERE id = @id";
+            var sql = "SELECT * FROM user_profiles WHERE user_id = @user_id";
             using (var connection = this.GetOpenConnection())
             {
 
-                var result = await connection.QuerySingleOrDefaultAsync<UserProfile>(sql, new { id = id });
+                var result = await connection.QuerySingleOrDefaultAsync<UserProfile>(sql, new { user_id = user_id });
                 return result;
             }
         }
@@ -205,15 +206,29 @@ namespace AppZeroAPI.Repository
                 return false;
         }
 
-        public async Task<int> DeleteByUserIdAsync(string id) { await Task.Delay(10); return 0; }
-        public async Task<int> DeleteByIdAsync(int id) { await Task.Delay(10); return 0; }
+        
+        public async Task<bool> DeleteByIdAsync(int id)
+        {
+            //var sql = "delete from user_profiles WHERE user_id = @userid";
+            //using (var connection = this.GetOpenConnection())
+            //{
+
+            //    var result = await connection.ExecuteAsync(sql, new { userid = id });
+            //    return true;
+            //}
+            using (var connection = this.GetOpenConnection())
+            {
+                var result = await connection.DeleteAsync(new UserProfile { user_id = id });
+                return result;
+            }
+        }
 
 
         public async Task<int> AddRefreshTokenAsync(UserTokenData entity)
         {
             entity.CreatedAt = DateTime.Now;
-            var sql = @"Insert into user_refresh_tokens ([user_id],[access_token],[refresh_token],[expires_at],[created_at] )
-                        VALUES (@user_id,@AccessToken, @RefreshToken,@ExpiresAt, @CreatedAt)";
+            var sql = @"Insert into user_refresh_tokens ([user_id],[access_token],[refresh_token],[expires_at],black_listed,created_by_ip,[created_at] )
+                        VALUES (@user_id,@AccessToken, @RefreshToken,@ExpiresAt,@BlackListed,@CreatedByIP, @CreatedAt)";
             using (var connection = this.GetOpenConnection())
             {
                 var result = await connection.ExecuteAsync(sql, entity);

@@ -9,8 +9,8 @@ namespace AppZeroAPI.Interfaces
 {
     public interface IAuthService
     {
-        Task<UserTokenResponse> Authenticate(LoginDto model, string ipAddress = "");
-        Task<UserTokenResponse> RenewAccessToken(AuthInfo request, string ipAddress = "");
+        Task<ResponseAuthDto> Authenticate(LoginDto model, string ipAddress = "");
+        Task<ResponseAuthDto> RenewAccessToken(RequestAuthDto request, string ipAddress = "");
         Task<int> SignUp(RegisterDto user, string ipAddress = "");
         Task<bool> RevokeToken(string token);
         Task Logout(string email);

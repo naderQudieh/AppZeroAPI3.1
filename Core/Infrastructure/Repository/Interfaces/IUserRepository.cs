@@ -13,7 +13,7 @@ namespace AppZeroAPI.Interfaces
     { 
         Task<UserProfile> GetByUserIdAsync(string userid);
         Task<UserProfile> GetUserByEmailAsync(string email);
-        Task<int> DeleteByUserIdAsync(string userid);
+        Task<bool> DeleteByIdAsync(int id);
         Task<int> AddUserAsync(UserProfile user);
         Task<bool> ResetPasswordAsync(UserProfile user, string token, string NewPassword);
         Task<string> GeneratePasswordResetTokenAsync(UserProfile user); 

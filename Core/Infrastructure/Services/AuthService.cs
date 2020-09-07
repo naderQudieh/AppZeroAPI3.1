@@ -4,6 +4,7 @@ using AppZeroAPI.Models;
 using AppZeroAPI.Repository;
 using AppZeroAPI.Shared;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -34,43 +35,51 @@ namespace AppZeroAPI.Services
         }
 
        
-        public async Task<UserTokenResponse>  Authenticate(LoginDto model, string ipAddress = "")
+        public async Task<ResponseAuthDto>  Authenticate(LoginDto model, string ipAddress = "")
         {
-            var user = await this.unitOfWork.Users.GetUserByEmailAsync(model.Email); 
+            var user = await this.unitOfWork.Users.GetUserByEmailAsync(model.username); 
             if (user == null)
                 throw new AppException("User not found - Invalid Email");
 
-            if (user.password_hash == Helper.HashPassword(model.Password, user.password_salt))
+            if (user.password_hash == Helper.HashPassword(model.password, user.password_salt))
             {
                 throw new AppException("Invalid password");
             }
             
-            var result = _mapper.Map<UserInfo>(user);
-            TokenDto newAccessToken = tokenService.generateAccessToken(result);
-            TokenDto newRefreshToken = tokenService.generateRefreshToken(result);
+            var userInfo = _mapper.Map<UserInfo>(user);
+            TokenDto newAccessToken = tokenService.generateAccessToken(userInfo);
+            TokenDto newRefreshToken = tokenService.generateRefreshToken(userInfo);
 
             var token = new UserTokenData()
-            {
-
+            { 
                 AccessToken = newAccessToken.EncodedToken,
                 RefreshToken = newRefreshToken.EncodedToken,
                 BlackListed = false,
                 ExpiresAt = newRefreshToken.TokenModel.ValidTo,
                 CreatedAt = newRefreshToken.TokenModel.IssuedAt,
-                CreatedByIP = ipAddress
+                CreatedByIP = ipAddress,
+                 
+
             } ;
+
             token.user_id = user.user_id;
             await this.unitOfWork.Users.AddRefreshTokenAsync(token);
-            return new UserTokenResponse
+            var tokenInfo  = new TokenInfoDto
             {
                 AccessToken = newAccessToken.EncodedToken,
                 RefreshToken = newRefreshToken.EncodedToken,
-                ExpiresAt = newRefreshToken.TokenModel.ValidTo 
+                ExpiresAt = newRefreshToken.TokenModel.ValidTo ,
+                TokenType = JwtBearerDefaults.AuthenticationScheme
             };
+            return new ResponseAuthDto {
+                      Token = tokenInfo,
+                      User = userInfo
+            };
+
         }
 
         
-        public async Task<UserTokenResponse>   RenewAccessToken(AuthInfo request , string ipAddress = "")
+        public async Task<ResponseAuthDto>   RenewAccessToken(RequestAuthDto request , string ipAddress = "")
         {
             JwtSecurityToken decodedToken = this.tokenService.decodeToken(request.RefreshToken);
             var user = await  this.unitOfWork.Users.GetByIdAsync(int.Parse(decodedToken.Subject)); 
@@ -101,9 +110,9 @@ namespace AppZeroAPI.Services
             }
             
             //AutoMapper.Mapper.Map<Destination>(source);
-            var result = _mapper.Map<UserInfo>(user);
-            TokenDto newAccessToken = tokenService.generateAccessToken(result);
-            TokenDto newRefreshToken = tokenService.generateRefreshToken(result);
+            var userInfo = _mapper.Map<UserInfo>(user);
+            TokenDto newAccessToken = tokenService.generateAccessToken(userInfo);
+            TokenDto newRefreshToken = tokenService.generateRefreshToken(userInfo);
              
             await this.unitOfWork.Users.BlackListed(tokenRecord.TokenId);
 
@@ -118,11 +127,17 @@ namespace AppZeroAPI.Services
                 CreatedByIP = ipAddress
             };
             await this.unitOfWork.Users.AddRefreshTokenAsync(token);
-            return new UserTokenResponse
+            var tokenInfo = new TokenInfoDto
             {
                 AccessToken = newAccessToken.EncodedToken,
                 RefreshToken = newRefreshToken.EncodedToken,
                 ExpiresAt = newRefreshToken.TokenModel.ValidTo,
+                TokenType = JwtBearerDefaults.AuthenticationScheme
+            };
+            return new ResponseAuthDto
+            {
+                Token = tokenInfo,
+                User = userInfo
             };
         }
        

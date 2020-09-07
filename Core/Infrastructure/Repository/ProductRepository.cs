@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Dapper.Contrib.Extensions;
 
 namespace AppZeroAPI.Repository
 {
@@ -22,18 +23,38 @@ namespace AppZeroAPI.Repository
        
  
         public    async Task<IEnumerable<Product>> GetAllAsync()
+        { 
+           
+            //logger.LogInformation(sql);
+            using (var connection = this.GetOpenConnection())
+            {   
+                var result = await connection.GetAllAsync<Product>();
+                return result.ToList();
+            }
+        }
+        private async Task<IEnumerable<Product>> GetAllAsync2()
         {
 
             var sql = "SELECT * FROM Products";
-          
+
             logger.LogInformation(sql);
             using (var connection = this.GetOpenConnection())
-            {   
+            {
                 var result = await connection.QueryAsync<Product>(sql);
                 return result.ToList();
-            } 
+            }
         }
-        public    async Task<int> AddAsync(Product entity)
+
+        public async Task<int> AddAsync(Product entity)
+        {
+            using (var connection = this.GetOpenConnection())
+            {
+                entity.AddedOn = DateTime.UtcNow;
+                var result = await connection.InsertAsync(entity);
+                return result;
+            }
+        }
+        private    async Task<int> AddAsync2(Product entity)
         {
             entity.AddedOn = DateTime.Now;
             var sql = "Insert into Products (Name,Description,Barcode,Rate,AddedOn) VALUES (@Name,@Description,@Barcode,@Rate,@AddedOn)";
@@ -44,7 +65,16 @@ namespace AppZeroAPI.Repository
             }
         }
 
-        public    async Task<int> DeleteByIdAsync(int id)
+
+        public async Task<bool> DeleteByIdAsync(int id)
+        { 
+            using (var connection = this.GetOpenConnection())
+            {
+                var result = await connection.DeleteAsync(new Product() { Id = 1 });
+                return result;
+            }
+        }
+        private    async Task<int> DeleteByIdAsync2(int id)
         {
             var sql = "DELETE FROM Products WHERE Id = @Id";
             using (var connection = this.GetOpenConnection())
@@ -54,9 +84,17 @@ namespace AppZeroAPI.Repository
             }
         }
 
-       
 
-        public   async Task<Product> GetByIdAsync(int id)
+        public async Task<Product> GetByIdAsync(int id)
+        { 
+            using (var connection = this.GetOpenConnection())
+            {
+
+                var result = await connection.GetAsync<Product>(new { id = id });
+                return result;
+            }
+        }
+        private   async Task<Product> GetByIdAsync2(int id)
         {
             var sql = "SELECT * FROM Products WHERE Id = @Id";
              using (var connection = this.GetOpenConnection())

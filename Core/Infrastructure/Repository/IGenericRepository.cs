@@ -7,7 +7,7 @@ namespace AppZeroAPI.Interfaces
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     { 
-        Task<int> DeleteByIdAsync(int id);
+        Task<bool> DeleteByIdAsync(int id);
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity> GetByIdAsync(int id); 
         Task<int> AddAsync(TEntity entity);

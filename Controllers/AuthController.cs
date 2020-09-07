@@ -1,5 +1,6 @@
 ﻿using AppZeroAPI.Controllers;
 using AppZeroAPI.Interfaces;
+using AppZeroAPI.Middleware;
 using AppZeroAPI.Models;
 using AppZeroAPI.Services;
 using AppZeroAPI.Shared;
@@ -36,8 +37,8 @@ namespace AppZeroAPI.Controllers
         [Route("Authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] LoginDto model)
         {
-            if (string.IsNullOrEmpty(model.Email)
-                || string.IsNullOrEmpty(model.Password) )
+            if (string.IsNullOrEmpty(model.username)
+                || string.IsNullOrEmpty(model.password) )
             {
                 return AppResponse.BadRequest("All fields are required");
             }
@@ -45,34 +46,34 @@ namespace AppZeroAPI.Controllers
 
             ModelValidator.Validate(model);
             string ipaddress = Helper.getIPAddress(this.Request);
-            var refresh = await authService.Authenticate(model, ipaddress);
-            if (refresh == null)
+            var authResponse = await authService.Authenticate(model, ipaddress);
+            if (authResponse == null || authResponse.Token ==null)
                 return  AppResponse.Unauthorized("Invalid Token");
 
-            if (string.IsNullOrEmpty(refresh.AccessToken) || string.IsNullOrEmpty(refresh.RefreshToken)  )
+            if (string.IsNullOrEmpty(authResponse.Token.AccessToken) || string.IsNullOrEmpty(authResponse.Token.RefreshToken)  )
                 return AppResponse.Unauthorized("Invalid Token");
 
-            setTokenCookie(refresh.RefreshToken);
-            return AppResponse.Success(refresh);
+            setTokenCookie(authResponse.Token.RefreshToken);
+            return AppResponse.Success(authResponse);
 
         }
 
 
         [HttpPost]
         [Route("refresh-token")]
-        public async Task<IActionResult> RenewAccessToken([FromBody] AuthInfo request)
+        public async Task<IActionResult> RenewAccessToken([FromBody] RequestAuthDto request)
         {
             ModelValidator.Validate(request);
             var refreshToken = Request.Cookies["refreshToken"];
             string ipaddress = Helper.getIPAddress(this.Request); 
-            var response = await authService.RenewAccessToken(request, ipaddress);
-            if (response == null)
+            var authResponse = await authService.RenewAccessToken(request, ipaddress);
+            if (authResponse == null)
                 return AppResponse.Unauthorized("Invalid Token");
 
-            if (string.IsNullOrEmpty(response.AccessToken) || string.IsNullOrEmpty(response.RefreshToken))
+            if (string.IsNullOrEmpty(authResponse.Token.AccessToken) || string.IsNullOrEmpty(authResponse.Token.RefreshToken))
                 return AppResponse.Unauthorized("Invalid Token");
-            setTokenCookie(response.RefreshToken);
-            return AppResponse.Success(response); 
+            setTokenCookie(authResponse.Token.RefreshToken);
+            return AppResponse.Success(authResponse); 
         }
 
         [HttpPost("signup")]
