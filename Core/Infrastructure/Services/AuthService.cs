@@ -204,7 +204,24 @@ namespace AppZeroAPI.Services
                 return false;
             stoken.BlackListed = true;
             await unitOfWork.Users.BlackListed(tokenId);
-            return true; 
+            return true;
+        }
+        public  bool  ValidateToken(string userId, string token)
+        {
+            try
+            {
+                var principal = this.tokenService.getPrincipalFromToken(token);
+
+                var id = principal.Identity.Name;
+
+                if (userId == id) return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return false;
         }
     }
 }

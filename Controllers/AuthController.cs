@@ -113,7 +113,22 @@ namespace AppZeroAPI.Controllers
             return Ok(new { message = "Token revoked" });
         }
 
+        [HttpGet("ValidateToken")]
+        public IActionResult ValidateToken(string Userid, string token)
+        {
+            try
+            {
+                var isValid = this.authService.ValidateToken(Userid, token);
 
+                return Ok(isValid);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return NotFound(ex.Message);
+            }
+
+        }
         [NonAction]
         public ActionResult Get(int start, int count)
         {
