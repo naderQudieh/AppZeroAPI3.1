@@ -107,9 +107,10 @@ namespace AppZeroAPI.Controllers
             if (string.IsNullOrEmpty(token))
                 return BadRequest(new { message = "Token is required" });
 
-            await authService.RevokeToken(_token);
+            bool response = await authService.RevokeToken(_token); 
+            if (!response)
+                return NotFound(new { message = "Token not found" });
 
-            
             return Ok(new { message = "Token revoked" });
         }
 
@@ -134,6 +135,15 @@ namespace AppZeroAPI.Controllers
         {
             throw new NotImplementedException();
         }
+
+        //[Authorize]
+        //[HttpPost("tokens/{id}")]
+        //public IActionResult GetRefreshTokens(string id)
+        //{
+        //    var user = this.authService.GetById(id);
+        //    return Ok(user.RefreshTokens);
+        //}
+
         private void setTokenCookie(string token)
         {
             var cookieOptions = new CookieOptions
